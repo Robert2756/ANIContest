@@ -9,71 +9,42 @@ import torch.optim as optim
 from learner import MLP
 
 TH = 0.5
-path_input = "./data/ANI_Training.Input"
-path_target = "./data/ANI_Training.Label"
 
 def test(model, selected_channels):
 
     PREDICTIONS = []
 
-    df = pd.read_csv(path_input, header=None) # (3250, 250)
-    df_test = df.iloc[2800:3250, :]
+    # import test dataset
+    path = "./data/ANI_Test.Input"
+    df = pd.read_csv(path, header=None) # (1750, 250)
 
-    target_train = pd.read_csv(path_target, header=None) # (3250, 1)
-    target_train = target_train.iloc[2800:3250, :]
-    target = target_train
+    print("df: ", df.shape)
 
-    data = np.array(df_test.T) # (250,  3250)
+    data = np.array(df.T) # (250,  1750)
     data = data[selected_channels, ::]
 
     # Normalize each feature separately
+    # 1. Compute min and max for each column
     min_vals = np.min(data, axis=1, keepdims=True)
     max_vals = np.max(data, axis=1, keepdims=True)
-    # print("min vals: ", min_vals)
-    # print("min vals: ", max_vals)
 
-    data = 2 * (data - min_vals) / (max_vals - min_vals) - 1
+    data = 2 * (data - min_vals) / (max_vals - min_vals) - 1 # (5, 1750)
     print("Data shape: ", np.array(data).shape)
 
     # iterate over test data
     for i in range(np.array(data).shape[1]):
         output = model(torch.tensor(data[:,i], dtype=torch.float32))
+
         # make outputs discrete
         if output>=0.5:
             PREDICTIONS.append(1)
         elif output<0.5:
             PREDICTIONS.append(0)
     
-    # compare with labels
-    predictions = np.array(PREDICTIONS).reshape(-1, 1)
-    print("target shape: ", np.array(target).shape)
-    print("PREDICTIONS: ", np.array(predictions).shape)
-
-    n = np.sum(target == 0)
-    p = np.sum(target == 1)
-
-    tp = 0
-    tn = 0
-    fp = 0
-    fn = 0
-
-    for i, pred in enumerate(predictions):
-        trgt = np.array(target).squeeze()[i]
-        pred = pred[0]
-
-        if pred == trgt and pred==1:
-            tp += 1
-        elif pred == trgt and pred==0:
-            tn += 1
-        elif pred != trgt and pred==1:
-            fp += 1
-        elif pred != trgt and pred==0:
-            fn += 1
-
-    BER = 1/2*(int(fn)/int(p) + int(fp)/int(n))
-    print("n: ", int(n))
-    print("p: ", int(p))
-    print("BER: ", BER)
+    # write predictions to output file
+    with open('data/Viehweg_63304_0507.Label', 'w') as file:
+        for number in PREDICTIONS:
+            file.write(f"{number}\n")
 
 
 selected_channels = [225, 182, 8, 166, 165, 164, 4, 220, 219, 86, 161, 160, 159, 158, 157, 156, 155, 154]

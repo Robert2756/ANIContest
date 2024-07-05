@@ -24,7 +24,7 @@ def initialize_weights(m):
         if m.bias is not None:
             init.zeros_(m.bias)
 
-# MIFS algorithm
+# # MIFS algorithm
 # # Read the data from the file
 # path_input = "./data/ANI_Training.Input"
 # path_target = "./data/ANI_Training.Label"
@@ -41,16 +41,16 @@ def initialize_weights(m):
 # '''
 
 # data = np.transpose(df) # (250,  3250)
-# selected_features = MIFS(np.array(data), np.array(target), beta=0.5, max_feature_len=5)
+# selected_features = MIFS(np.array(data), np.array(target), beta=0.5, max_feature_len=20)
 # print("selected features: ", selected_features)
-# time.sleep(100)
+# time.sleep(600)
 
-selected_features = [225, 182, 8, 166, 165]
+selected_features = [225, 182, 8, 166, 165, 164, 4, 220, 219, 86, 161, 160, 159, 158, 157, 156, 155, 154]
 dataset = ContestDataset(selected_channels=selected_features)
 dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
 
-model = MLP(input_size=len(selected_features), hidden_size=64, output_size=1).to("cpu")
-# model.apply(initialize_weights)
+model = MLP(input_size=len(selected_features), hidden_size=512, output_size=1).to("cpu")
+model.apply(initialize_weights)
 
 # Loss and optimizer
 criterion = nn.MSELoss()  # Example loss function (Mean Squared Error)
@@ -58,11 +58,11 @@ criterion = nn.MSELoss()  # Example loss function (Mean Squared Error)
 
 # Learning rate scheduler and optimizer
 optimizer = optim.Adam(model.parameters(), lr=0.001)
-scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10000, gamma=0.9)
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20000, gamma=0.8)
 
 step = 0
 epoch_step = 0
-num_epochs = 300
+num_epochs = 250
 loss_average = 0
 
 print("Start training")
