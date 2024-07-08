@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 import torch.nn as nn
+from MIFS import mutual_infxy
 from torch.utils.data import Dataset
 
 import torch.nn.functional as F
@@ -14,12 +15,11 @@ path_target = "./data/ANI_Training.Label"
 class ContestDataset(Dataset):
     def __init__(self, selected_channels):
         df = pd.read_csv(path_input, header=None) # (3250, 250)
-        # df_train = df.iloc[0:2800, :]
-        df_train = df
+        df_train = df.iloc[0:3000, :]
         print("df_train: ", np.array(df_train).shape)
 
         target_train = pd.read_csv(path_target, header=None) # (3250, 1)
-        # target_train = target_train.iloc[0:2800, :]
+        target_train = target_train.iloc[0:3000, :]
         self.target = target_train
 
         data = np.array(df_train.T) # (250,  3250)
@@ -32,6 +32,12 @@ class ContestDataset(Dataset):
         # print("min vals: ", max_vals)
 
         self.data = 2 * (data - min_vals) / (max_vals - min_vals) - 1
+
+        # for i, channel in enumerate(self.data):
+        #     print(i)
+        #     MI = mutual_infxy(np.array(channel), np.array(self.target))
+        #     print(MI)
+        # time.sleep(100)
         
     def __len__(self):
         return self.data.shape[1] # number of examples in the dataset
@@ -63,12 +69,20 @@ class MLP(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super(MLP, self).__init__()
         self.fc1 = nn.Linear(input_size, hidden_size)
-        self.bn1 = nn.BatchNorm1d(hidden_size)
-        self.relu = nn.ReLU()
+        # self.bn1 = nn.BatchNorm1d(hidden_size)
+        # self.tanh1 = nn.Tanh()
+        self.relu1 = nn.ReLU()
+        self.dropout1 = nn.Dropout(0.5)
         self.fc2 = nn.Linear(hidden_size, hidden_size)
-        self.bn2 = nn.BatchNorm1d(hidden_size)
+        # self.bn2 = nn.BatchNorm1d(int(hidden_size/2))
         self.relu2 = nn.ReLU()
-        self.fc3 = nn.Linear(hidden_size, output_size)
+        # self.tanh2 = nn.Tanh()
+        self.dropout2 = nn.Dropout(0.5)
+        self.fc3 = nn.Linear(hidden_size, hidden_size)
+        # self.tanh3 = nn.Tanh()
+        self.relu3 = nn.ReLU()
+        self.dropout3 = nn.Dropout(0.5)
+        self.fc4 = nn.Linear(hidden_size, output_size)
         # self.relu3 = nn.ReLU()
         # self.fc4 = nn.Linear(hidden_size, output_size)
         # self.sigmoid = nn.Sigmoid()
@@ -77,14 +91,18 @@ class MLP(nn.Module):
     def forward(self, x):
         # print("x: ", x)
         out = self.fc1(x)
-        # out = self.bn1(out)
-        out = self.relu(out)
+        out = self.relu1(out)
+        # out = self.tanh1(out)
+        out = self.dropout1(out)
         out = self.fc2(out)
-        # out = self.bn2(out)
+        # out = self.tanh2(out)
         out = self.relu2(out)
+        out = self.dropout2(out)
         out = self.fc3(out)
-        # out = self.relu3(out)
-        # out = self.fc4(out)
+        # out = self.tanh3(out)
+        out = self.relu3(out)
+        out = self.dropout3(out)
+        out = self.fc4(out)
         y = F.sigmoid(out)
         # print("y: ", y)
         return y

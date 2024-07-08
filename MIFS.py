@@ -1,8 +1,6 @@
 import time
 import numpy as np
 
-BETA = 0.5
-
 def criterion(feature, selected_features, I_xx, I_xy, beta):
     features_selected_sum = 0
 
@@ -193,31 +191,40 @@ def MIFS(data, target, beta, max_feature_len):
     data -> shape(250, 3250)
     '''
 
+    # Normalize each feature separately
+    min_vals = np.min(data, axis=1, keepdims=True)
+    max_vals = np.max(data, axis=1, keepdims=True)
+
+    data_norm = 2 * (data - min_vals) / (max_vals - min_vals) - 1
+
     # MIFS algorithm
     selected_features = []
-    remaining_features = list(range(data.shape[0])) # channel indices
+    remaining_features = list(range(data_norm.shape[0])) # channel indices
 
     # Mutual information between input and target
     MI_input_target = []
-    for channel in data:
-        MI_input_target.append(mutual_infxy(channel, target)) # (2, 250)
+    for channel in data_norm:
+        MI_input_target.append(mutual_infxy(channel, target))
     
     # Channel with the highest mutual information to target is starting point
     selected_features.append(np.argmax(MI_input_target)) # indices of MI_input_target
     remaining_features.remove(np.argmax(MI_input_target)) # indices of MI_input_target
 
+    print("MIFS value: ", MI_input_target[np.argmax(MI_input_target)])
+
     # Perform MIFS algorithm
-    while len(selected_features)<max_feature_len:
+    breakout = False
+    while breakout==False:
 
         MIFS = []
 
         # Select channel with highest MIFS value from remaining ones
         for feature_index in remaining_features:
             # Compute MIFS value
-            mutual_infxy_feature = mutual_infxy(data[feature_index], target)
+            mutual_infxy_feature = mutual_infxy(data_norm[feature_index], target)
             mutual_infxx_feature = 0
             for feature_index_selected in selected_features:
-                mutual_infxx_feature += mutual_infxx(data[feature_index], data[feature_index_selected])
+                mutual_infxx_feature += mutual_infxx(data_norm[feature_index], data_norm[feature_index_selected])
             MIFS.append(mutual_infxy_feature - beta*(mutual_infxx_feature))
             # print("MIFS: ", len(MIFS))
 
@@ -226,6 +233,10 @@ def MIFS(data, target, beta, max_feature_len):
         remaining_features.remove(np.argmax(MIFS)) # indices of MI_input_target
         print("Remaining features: ", remaining_features)
         print("Selected features: ", selected_features)
+        print("MIFS value: ", MIFS[selected_features[-1]])
+
+        if MIFS[selected_features[-1]]<0:
+            breakout = True
     
     return selected_features
 

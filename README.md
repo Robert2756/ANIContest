@@ -44,3 +44,20 @@ Loss of final epoch: 0.008599508553743362
 BER on test dataset, hidden_size=512, 3 Dense layers, 18 input features (trained on whole dataset), lr decay of 0.8 every 30000 steps, 250 epochs
 BER:  ; checkpoint_final3
 Loss of final epoch: 0.0070638819597661495
+
+# Overfitting
+## Adjusting MIFS algorithm
+beta = 0.1 (changed from 0.5)
+
+[225] -> 0.12657137027150012
+[8] -> 0.043420045275251444
+[181] -> 0.03613711693954798
+[180] -> 0.03557478345119342
+[179] -> 0.02905135698370739
+[178] -> 0.023041340694343403
+[177] -> 0.017362894473898507
+[176] -> 0.011365264752842198
+[175] -> 0.005567026051854912
+[174] -> -0.0008536679528394139
+
+selected features: [225, 8, 181, 180, 179, 178, 177, 176, 175]

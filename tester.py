@@ -13,14 +13,13 @@ path_input = "./data/ANI_Training.Input"
 path_target = "./data/ANI_Training.Label"
 
 def test(model, selected_channels):
-
     PREDICTIONS = []
 
     df = pd.read_csv(path_input, header=None) # (3250, 250)
-    df_test = df.iloc[2800:3250, :]
+    df_test = df.iloc[3000:3250, :]
 
     target_train = pd.read_csv(path_target, header=None) # (3250, 1)
-    target_train = target_train.iloc[2800:3250, :]
+    target_train = target_train.iloc[3000:3250, :]
     target = target_train
 
     data = np.array(df_test.T) # (250,  3250)
@@ -38,19 +37,22 @@ def test(model, selected_channels):
     # iterate over test data
     for i in range(np.array(data).shape[1]):
         output = model(torch.tensor(data[:,i], dtype=torch.float32))
+        # print("output: ", output)
+        # print("target: ", np.array(target)[i])
         # make outputs discrete
         if output>=0.5:
             PREDICTIONS.append(1)
         elif output<0.5:
             PREDICTIONS.append(0)
+            
     
     # compare with labels
     predictions = np.array(PREDICTIONS).reshape(-1, 1)
     print("target shape: ", np.array(target).shape)
     print("PREDICTIONS: ", np.array(predictions).shape)
 
-    n = np.sum(target == 0)
-    p = np.sum(target == 1)
+    n = np.sum(np.array(target) == 0)
+    p = np.sum(np.array(target) == 1)
 
     tp = 0
     tn = 0
@@ -60,6 +62,8 @@ def test(model, selected_channels):
     for i, pred in enumerate(predictions):
         trgt = np.array(target).squeeze()[i]
         pred = pred[0]
+        # print("pred: ", pred)
+        # print("trgt: ", trgt)
 
         if pred == trgt and pred==1:
             tp += 1
@@ -71,24 +75,23 @@ def test(model, selected_channels):
             fn += 1
 
     BER = 1/2*(int(fn)/int(p) + int(fp)/int(n))
-    print("n: ", int(n))
-    print("p: ", int(p))
-    print("BER: ", BER)
+    print("BER on test dataset: ", BER)
+    return BER
 
 
-selected_channels = [225, 182, 8, 166, 165, 164, 4, 220, 219, 86, 161, 160, 159, 158, 157, 156, 155, 154]
-model = MLP(input_size=len(selected_channels), hidden_size=512, output_size=1).to("cpu")
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+# selected_channels = [225, 8, 181, 180, 179, 178, 177, 176, 175]
+# model = MLP(input_size=len(selected_channels), hidden_size=512, output_size=1).to("cpu")
+# optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-# Load the checkpoint
-checkpoint = torch.load('checkpoint_final1.pth')
+# # Load the checkpoint
+# checkpoint = torch.load('checkpoint_Dropout_512_30epochs.pth')
 
-# Load the state_dict of the model and optimizer
-model.load_state_dict(checkpoint['model_state_dict'])
-optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+# # Load the state_dict of the model and optimizer
+# model.load_state_dict(checkpoint['model_state_dict'])
+# optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
-# inference
-model.eval()
+# # inference
+# model.eval()
 
-test(model=model, selected_channels=selected_channels)
+# test(model=model, selected_channels=selected_channels)
 
