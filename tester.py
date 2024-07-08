@@ -32,7 +32,6 @@ def test(model, selected_channels):
     # print("min vals: ", max_vals)
 
     data = 2 * (data - min_vals) / (max_vals - min_vals) - 1
-    print("Data shape: ", np.array(data).shape)
 
     # iterate over test data
     for i in range(np.array(data).shape[1]):
@@ -48,8 +47,6 @@ def test(model, selected_channels):
     
     # compare with labels
     predictions = np.array(PREDICTIONS).reshape(-1, 1)
-    print("target shape: ", np.array(target).shape)
-    print("PREDICTIONS: ", np.array(predictions).shape)
 
     n = np.sum(np.array(target) == 0)
     p = np.sum(np.array(target) == 1)
@@ -79,19 +76,19 @@ def test(model, selected_channels):
     return BER
 
 
-# selected_channels = [225, 8, 181, 180, 179, 178, 177, 176, 175]
-# model = MLP(input_size=len(selected_channels), hidden_size=512, output_size=1).to("cpu")
-# optimizer = optim.Adam(model.parameters(), lr=0.001)
+selected_channels = [225, 156, 8, 80, 166]
+model = MLP(input_size=len(selected_channels), hidden_size=32, output_size=1).to("cpu")
+optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-# # Load the checkpoint
-# checkpoint = torch.load('checkpoint_Dropout_512_30epochs.pth')
+# Load the checkpoint
+checkpoint = torch.load('checkpoint.pth')
 
-# # Load the state_dict of the model and optimizer
-# model.load_state_dict(checkpoint['model_state_dict'])
-# optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+# Load the state_dict of the model and optimizer
+model.load_state_dict(checkpoint['model_state_dict'])
+optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
-# # inference
-# model.eval()
+# inference
+model.eval()
 
-# test(model=model, selected_channels=selected_channels)
+test(model=model, selected_channels=selected_channels)
 
