@@ -19,86 +19,88 @@ import torch.nn.init as init
 # selected_features = [225, 8, 181, 180, 179, 178, 177, 176, 175]
 # selected_features = [i for i in range(0,250)]
 
-LOSSES = []
+BERS_AV = []
 BER = 1
+REPETITION = 3
 
 for  i in range(0, 250):
-# while BER>0.28:
+# while BER>0.28:or i==156 or i==8 or i==80
     print("i: ", i)
 
-    if i==225 or i==156 or i==8 or i==80:
-        LOSSES.append(1)
+    if i==225 or i==156 or i==132 or i==125:
+        BERS_AV.append(1)
         continue
 
-    selected_features = [225, 156, 8, 80, i]
-
-    dataset = ContestDataset(selected_channels=selected_features)
-    dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
-
-    model = MLP(input_size=len(selected_features), hidden_size=32, output_size=1).to("cpu")
-
-    # Loss and optimizer
-    criterion = nn.MSELoss()  # Example loss function (Mean Squared Error)
-    # criterion = nn.BCELoss()  # Binary Cross Entropy Loss
-
-    # Learning rate scheduler and optimizer
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20000, gamma=0.8)
-
-    step = 0
-    epoch_step = 0
+    selected_features = [225, 156, 132, 125, i]
     num_epochs = 1
-    loss_average = 0
-    BERS = []
-    losses = []
+    BERS_rep = []
 
-    print("Start training")
-    for epoch in tqdm(range(num_epochs)):
-        for inputs, targets in dataloader:
+    # # train five times and average the BER value
+    for rep in range(0,REPETITION):
 
-            step += 1
-            epoch_step += 1
+        dataset = ContestDataset(selected_channels=selected_features)
+        dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
 
-            targets = targets.view(-1, 1)  # Reshape to (batch_size, 1)
+        model = MLP(input_size=len(selected_features), hidden_size=32, output_size=1).to("cpu")
 
-            # Forward pass
-            outputs = model(inputs)
-            loss = criterion(outputs, targets)
-            
-            # Backward and optimize
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+        # Loss and optimizer
+        criterion = nn.MSELoss()  # Example loss function (Mean Squared Error)
+        # criterion = nn.BCELoss()  # Binary Cross Entropy Loss
 
-            # Step the scheduler
-            scheduler.step()
-            loss_average +=loss
+        # Learning rate scheduler and optimizer
+        optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-        if (epoch+1) % 1 == 0:
-            print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}, Loss average: {loss_average/epoch_step}, Learning Rate: {scheduler.get_last_lr()[0]:.6f}')
-            BER = test(model=model, selected_channels=selected_features)
-            BERS.append(BER)
-            losses.append(loss_average.detach().numpy()/epoch_step)
-        final_loss = loss_average/epoch_step
+        step = 0
         epoch_step = 0
+        losses = []
         loss_average = 0
+        print("rep: ", rep)
+
+        for epoch in tqdm(range(num_epochs)):
+            for inputs, targets in dataloader:
+
+                step += 1
+                epoch_step += 1
+
+                targets = targets.view(-1, 1)  # Reshape to (batch_size, 1)
+
+                # Forward pass
+                # print(inputs)
+                outputs = model(inputs)
+                # print("outputs: ", outputs)
+                loss = criterion(outputs, targets)
+                
+                # Backward and optimize
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+
+                # Step the scheduler
+                loss_average +=loss
+
+            if (epoch+1) % 1 == 0:
+                print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}, Loss average: {loss_average/epoch_step}')
+                BER = test(model=model, selected_channels=selected_features)
+                BERS_rep.append(BER)
+            final_loss = loss_average/epoch_step
+            epoch_step = 0
+            loss_average = 0
     
-    LOSSES.append(BERS[-1])
-    print("Loss: ",BERS[-1])
+    # create average BER measurements
+    print(BERS_rep)
+    BERS_AV.append((np.sum(BERS_rep)/REPETITION))
+    print("BER averaged: ", BERS_AV[-1])
+        
+print(BERS_AV)
 
-    if BERS[-1]<=0.285:
-        break
+# # Save the checkpoint
+# checkpoint = {
+#     'epoch': epoch,
+#     'model_state_dict': model.state_dict(),
+#     'optimizer_state_dict': optimizer.state_dict(),
+# }
 
-print(LOSSES)
-
-# Save the checkpoint
-checkpoint = {
-    'epoch': epoch,
-    'model_state_dict': model.state_dict(),
-    'optimizer_state_dict': optimizer.state_dict(),
-}
-
-torch.save(checkpoint, 'checkpoint.pth')
+# torch.save(checkpoint, 'checkpoint.pth')
 
 # print(losses)
 # fig, axes = plt.subplots(ncols=1, nrows=2)

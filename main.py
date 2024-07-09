@@ -37,9 +37,9 @@ import torch.nn.init as init
 # print("selected features: ", selected_features)
 # time.sleep(600)
 
-# selected_features = [225, 8, 181, 180, 179, 178, 177, 176, 175]
+selected_features = [225, 8, 181, 180, 179, 178, 177, 176, 175]
 # selected_features = [i for i in range(0,250)]
-selected_features = [225, 156, 8, 80] # , 170]
+# selected_features = [225, 156, 8, 80] # , 170]
 
 dataset = ContestDataset(selected_channels=selected_features)
 dataloader = DataLoader(dataset, batch_size=8, shuffle=True)

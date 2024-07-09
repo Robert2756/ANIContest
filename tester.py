@@ -9,8 +9,10 @@ import torch.optim as optim
 from learner import MLP
 
 TH = 0.5
-path_input = "./data/ANI_Training.Input"
-path_target = "./data/ANI_Training.Label"
+# path_input = "./data/ANI_Training.Input"
+path_input = "/home/viehrt/Documents/ANiContest/ANIContest/data/ANI_Training.Input"
+# path_target = "./data/ANI_Training.Label"
+path_target = "/home/viehrt/Documents/ANiContest/ANIContest/data/ANI_Training.Label"
 
 def test(model, selected_channels):
     PREDICTIONS = []
@@ -72,23 +74,24 @@ def test(model, selected_channels):
             fn += 1
 
     BER = 1/2*(int(fn)/int(p) + int(fp)/int(n))
+    print(tp, tn, fp, fn)
     print("BER on test dataset: ", BER)
     return BER
 
 
-selected_channels = [225, 156, 8, 80, 166]
-model = MLP(input_size=len(selected_channels), hidden_size=32, output_size=1).to("cpu")
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+# selected_channels = [225, 156, 8, 80, 166]
+# model = MLP(input_size=len(selected_channels), hidden_size=32, output_size=1).to("cpu")
+# optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-# Load the checkpoint
-checkpoint = torch.load('checkpoint.pth')
+# # Load the checkpoint
+# checkpoint = torch.load('checkpoint.pth')
 
-# Load the state_dict of the model and optimizer
-model.load_state_dict(checkpoint['model_state_dict'])
-optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+# # Load the state_dict of the model and optimizer
+# model.load_state_dict(checkpoint['model_state_dict'])
+# optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
-# inference
-model.eval()
+# # inference
+# model.eval()
 
-test(model=model, selected_channels=selected_channels)
+# test(model=model, selected_channels=selected_channels)
 
