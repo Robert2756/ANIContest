@@ -9,8 +9,10 @@ import torch.optim as optim
 from learner import MLP
 
 TH = 0.5
-path_input = "./data/ANI_Training.Input"
-path_target = "./data/ANI_Training.Label"
+# path_input = "./data/ANI_Training.Input"
+path_input = "/home/viehrt/Documents/ANiContest/ANIContest/data/ANI_Training.Input"
+# path_target = "./data/ANI_Training.Label"
+path_target = "/home/viehrt/Documents/ANiContest/ANIContest/data/ANI_Training.Label"
 
 def test(model, selected_channels):
     PREDICTIONS = []
@@ -32,7 +34,6 @@ def test(model, selected_channels):
     # print("min vals: ", max_vals)
 
     data = 2 * (data - min_vals) / (max_vals - min_vals) - 1
-    print("Data shape: ", np.array(data).shape)
 
     # iterate over test data
     for i in range(np.array(data).shape[1]):
@@ -48,8 +49,6 @@ def test(model, selected_channels):
     
     # compare with labels
     predictions = np.array(PREDICTIONS).reshape(-1, 1)
-    print("target shape: ", np.array(target).shape)
-    print("PREDICTIONS: ", np.array(predictions).shape)
 
     n = np.sum(np.array(target) == 0)
     p = np.sum(np.array(target) == 1)
@@ -75,16 +74,17 @@ def test(model, selected_channels):
             fn += 1
 
     BER = 1/2*(int(fn)/int(p) + int(fp)/int(n))
+    print(tp, tn, fp, fn)
     print("BER on test dataset: ", BER)
     return BER
 
 
-# selected_channels = [225, 8, 181, 180, 179, 178, 177, 176, 175]
-# model = MLP(input_size=len(selected_channels), hidden_size=512, output_size=1).to("cpu")
+# selected_channels = [225, 156, 8, 80, 166]
+# model = MLP(input_size=len(selected_channels), hidden_size=32, output_size=1).to("cpu")
 # optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 # # Load the checkpoint
-# checkpoint = torch.load('checkpoint_Dropout_512_30epochs.pth')
+# checkpoint = torch.load('checkpoint.pth')
 
 # # Load the state_dict of the model and optimizer
 # model.load_state_dict(checkpoint['model_state_dict'])

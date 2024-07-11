@@ -18,8 +18,6 @@ def test(model, selected_channels):
     path = "./data/ANI_Test.Input"
     df = pd.read_csv(path, header=None) # (1750, 250)
 
-    print("df: ", df.shape)
-
     data = np.array(df.T) # (250,  1750)
     data = data[selected_channels, ::]
 
@@ -29,7 +27,6 @@ def test(model, selected_channels):
     max_vals = np.max(data, axis=1, keepdims=True)
 
     data = 2 * (data - min_vals) / (max_vals - min_vals) - 1 # (5, 1750)
-    print("Data shape: ", np.array(data).shape)
 
     # iterate over test data
     for i in range(np.array(data).shape[1]):
@@ -47,12 +44,12 @@ def test(model, selected_channels):
             file.write(f"{number}\n")
 
 
-selected_channels = [225, 182, 8, 166, 165, 164, 4, 220, 219, 86, 161, 160, 159, 158, 157, 156, 155, 154]
-model = MLP(input_size=len(selected_channels), hidden_size=512, output_size=1).to("cpu")
+selected_channels = [225, 156, 8, 80, 166]
+model = MLP(input_size=len(selected_channels), hidden_size=32, output_size=1).to("cpu")
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 # Load the checkpoint
-checkpoint = torch.load('checkpoint_final1.pth')
+checkpoint = torch.load('checkpoint.pth')
 
 # Load the state_dict of the model and optimizer
 model.load_state_dict(checkpoint['model_state_dict'])

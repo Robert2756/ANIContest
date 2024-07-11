@@ -16,33 +16,35 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 import torch.nn.init as init
 
-# MIFS algorithm
-# Read the data from the file
-path_input = "./data/ANI_Training.Input"
-path_target = "./data/ANI_Training.Label"
-df = pd.read_csv(path_input, header=None) # (3250, 250)
-target = pd.read_csv(path_target, header=None) # (3250, 1)
+# # MIFS algorithm
+# # Read the data from the file
+# path_input = "./data/ANI_Training.Input"
+# path_target = "./data/ANI_Training.Label"
+# df = pd.read_csv(path_input, header=None) # (3250, 250)
+# target = pd.read_csv(path_target, header=None) # (3250, 1)
 
-print(np.array(df).shape)
-print(np.array(target).shape)
+# print(np.array(df).shape)
+# print(np.array(target).shape)
 
-# MIFS algorithm and mutual information
-'''
-Which input channels korrelate the most with the output channel? -> Mutual information
-Which input channels korrelate the most with the output channel and have the lowest redundancy? -> MIFS algorithm
-'''
+# # MIFS algorithm and mutual information
+# '''
+# Which input channels korrelate the most with the output channel? -> Mutual information
+# Which input channels korrelate the most with the output channel and have the lowest redundancy? -> MIFS algorithm
+# '''
 
-data = np.transpose(df) # (250,  3250)
-selected_features = MIFS(np.array(data), np.array(target), beta=0.1, max_feature_len=20)
-print("selected features: ", selected_features)
-time.sleep(600)
+# data = np.transpose(df) # (250,  3250)
+# selected_features = MIFS(np.array(data), np.array(target), beta=0.1, max_feature_len=20)
+# print("selected features: ", selected_features)
+# time.sleep(600)
 
-# selected_features = [225, 8, 181, 180, 179, 178, 177, 176, 175]
-selected_features = [i for i in range(0,250)]
+selected_features = [225, 8, 181, 180, 179, 178, 177, 176, 175]
+# selected_features = [i for i in range(0,250)]
+# selected_features = [225, 156, 8, 80] # , 170]
+
 dataset = ContestDataset(selected_channels=selected_features)
 dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
 
-model = MLP(input_size=len(selected_features), hidden_size=256, output_size=1).to("cpu")
+model = MLP(input_size=len(selected_features), hidden_size=64, output_size=1).to("cpu")
 
 # Loss and optimizer
 criterion = nn.MSELoss()  # Example loss function (Mean Squared Error)
@@ -54,12 +56,13 @@ scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20000, gamma=0.8)
 
 step = 0
 epoch_step = 0
-num_epochs = 30
+num_epochs = 1
 loss_average = 0
 BERS = []
 losses = []
 
 print("Start training")
+
 for epoch in tqdm(range(num_epochs)):
     for inputs, targets in dataloader:
 
@@ -69,11 +72,8 @@ for epoch in tqdm(range(num_epochs)):
         targets = targets.view(-1, 1)  # Reshape to (batch_size, 1)
 
         # Forward pass
-        print("Input: ", inputs)
-        print("Target: ", targets)
         outputs = model(inputs)
         loss = criterion(outputs, targets)
-        print("Outputs: ", outputs)
         
         # Backward and optimize
         optimizer.zero_grad()
