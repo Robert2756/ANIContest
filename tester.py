@@ -9,10 +9,10 @@ import torch.optim as optim
 from learner import MLP
 
 TH = 0.5
-# path_input = "./data/ANI_Training.Input"
-path_input = "/home/viehrt/Documents/ANiContest/ANIContest/data/ANI_Training.Input"
-# path_target = "./data/ANI_Training.Label"
-path_target = "/home/viehrt/Documents/ANiContest/ANIContest/data/ANI_Training.Label"
+path_input = "./data/ANI_Training.Input"
+# path_input = "/home/viehrt/Documents/ANiContest/ANIContest/data/ANI_Training.Input"
+path_target = "./data/ANI_Training.Label"
+# path_target = "/home/viehrt/Documents/ANiContest/ANIContest/data/ANI_Training.Label"
 
 def test(model, selected_channels):
     PREDICTIONS = []

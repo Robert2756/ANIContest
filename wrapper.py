@@ -21,17 +21,16 @@ import torch.nn.init as init
 
 BERS_AV = []
 BER = 1
-REPETITION = 3
+REPETITION = 5
 
 for  i in range(0, 250):
-# while BER>0.28:or i==156 or i==8 or i==80
     print("i: ", i)
 
-    if i==225 or i==156 or i==132 or i==125:
+    if i==225 or i==156 or i==132 or i==125 or i==58 or i==151 or i==172 or i==120:
         BERS_AV.append(1)
         continue
 
-    selected_features = [225, 156, 132, 125, i]
+    selected_features = [225, 156, 132, 125, 58, 151, 172, 120, i]
     num_epochs = 1
     BERS_rep = []
 
@@ -41,14 +40,14 @@ for  i in range(0, 250):
         dataset = ContestDataset(selected_channels=selected_features)
         dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
 
-        model = MLP(input_size=len(selected_features), hidden_size=32, output_size=1).to("cpu")
+        model = MLP(input_size=len(selected_features), hidden_size=256, output_size=1).to("cpu")
 
         # Loss and optimizer
         criterion = nn.MSELoss()  # Example loss function (Mean Squared Error)
         # criterion = nn.BCELoss()  # Binary Cross Entropy Loss
 
         # Learning rate scheduler and optimizer
-        optimizer = optim.Adam(model.parameters(), lr=0.001)
+        optimizer = optim.Adam(model.parameters(), lr=0.005)
 
         step = 0
         epoch_step = 0
