@@ -21,16 +21,17 @@ import torch.nn.init as init
 
 BERS_AV = []
 BER = 1
-REPETITION = 5
+REPETITION = 1
 
-for  i in range(0, 250):
-    print("i: ", i)
+# for  i in range(0, 250):
+#     print("i: ", i)
 
-    if i==225 or i==156 or i==132 or i==125 or i==58 or i==151 or i==172 or i==120:
-        BERS_AV.append(1)
-        continue
+#     if i==225 or i==156 or i==132 or i==125 or i==58 or i==151 or i==172 or i==120 or i==117: # or i==114 or i==209 or i==241 or i==29 or i==217:
+#         BERS_AV.append(1)
+#         continue
 
-    selected_features = [225, 156, 132, 125, 58, 151, 172, 120, i]
+while BER>0.275:
+    selected_features = [225, 156, 132, 125, 58, 151, 172, 120, 117] # , 114, 209, 241, 29, 217, i]
     num_epochs = 1
     BERS_rep = []
 
@@ -92,14 +93,14 @@ for  i in range(0, 250):
         
 print(BERS_AV)
 
-# # Save the checkpoint
-# checkpoint = {
-#     'epoch': epoch,
-#     'model_state_dict': model.state_dict(),
-#     'optimizer_state_dict': optimizer.state_dict(),
-# }
+# Save the checkpoint
+checkpoint = {
+    'epoch': epoch,
+    'model_state_dict': model.state_dict(),
+    'optimizer_state_dict': optimizer.state_dict(),
+}
 
-# torch.save(checkpoint, 'checkpoint.pth')
+torch.save(checkpoint, 'checkpoint.pth')
 
 # print(losses)
 # fig, axes = plt.subplots(ncols=1, nrows=2)

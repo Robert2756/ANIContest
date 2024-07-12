@@ -15,11 +15,11 @@ path_target = "./data/ANI_Training.Label"
 class ContestDataset(Dataset):
     def __init__(self, selected_channels):
         df = pd.read_csv(path_input, header=None) # (3250, 250)
-        df_train = df.iloc[0:3000, :]
+        df_train = df.iloc[0:2500, :]
         # print("df_train: ", np.array(df_train).shape)
 
         target_train = pd.read_csv(path_target, header=None) # (3250, 1)
-        target_train = target_train.iloc[0:3000, :]
+        target_train = target_train.iloc[0:2500, :]
         self.target = target_train
 
         data = np.array(df_train.T) # (250,  3250)
@@ -83,8 +83,12 @@ class MLP(nn.Module):
         self.relu3 = nn.ReLU()
         # self.dropout3 = nn.Dropout(0.5)
         self.fc4 = nn.Linear(int(hidden_size/4), output_size)
-        # self.relu3 = nn.ReLU()
-        # self.fc4 = nn.Linear(hidden_size, output_size)
+        # self.relu4 = nn.ReLU()
+        # self.fc5 = nn.Linear(hidden_size, hidden_size)
+        # self.relu5 = nn.ReLU()
+        # self.fc6 = nn.Linear(hidden_size, int(hidden_size/4))
+        # self.relu6 = nn.ReLU()
+        # self.fc7 = nn.Linear(int(hidden_size/4), output_size)
         # self.sigmoid = nn.Sigmoid()
         # self.softmax = nn.Softmax()
     
@@ -103,6 +107,12 @@ class MLP(nn.Module):
         out = self.relu3(out)
         # out = self.dropout3(out)
         out = self.fc4(out)
+        # out = self.relu4(out)
+        # out = self.fc5(out)
+        # out = self.relu5(out)
+        # out = self.fc6(out)
+        # out = self.relu6(out)
+        # out = self.fc7(out)
         y = F.sigmoid(out)
         # print("y: ", y)
         return y

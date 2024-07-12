@@ -37,21 +37,22 @@ import torch.nn.init as init
 # print("selected features: ", selected_features)
 # time.sleep(600)
 
-selected_features = [225, 8, 181, 180, 179, 178, 177, 176, 175]
+# selected_features = [225, 8, 181, 180, 179, 178, 177, 176, 175]
 # selected_features = [i for i in range(0,250)]
 # selected_features = [225, 156, 8, 80] # , 170]
+selected_features = [225, 156, 132, 125, 58, 151, 172, 120, 117]
 
 dataset = ContestDataset(selected_channels=selected_features)
 dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
 
-model = MLP(input_size=len(selected_features), hidden_size=64, output_size=1).to("cpu")
+model = MLP(input_size=len(selected_features), hidden_size=256, output_size=1).to("cpu")
 
 # Loss and optimizer
 criterion = nn.MSELoss()  # Example loss function (Mean Squared Error)
 # criterion = nn.BCELoss()  # Binary Cross Entropy Loss
 
 # Learning rate scheduler and optimizer
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = optim.Adam(model.parameters(), lr=0.005)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20000, gamma=0.8)
 
 step = 0
@@ -102,14 +103,14 @@ checkpoint = {
 
 torch.save(checkpoint, 'checkpoint.pth')
 
-print(losses)
-fig, axes = plt.subplots(ncols=1, nrows=2)
-axes[0].plot(np.linspace(1, num_epochs, num_epochs), BERS)
-axes[0].set_title('BER per epoch')
-axes[0].set_xlabel('Epochs')
-axes[0].set_ylabel('BER')
-axes[1].plot(np.linspace(1, num_epochs, num_epochs), losses)
-axes[1].set_title('Loss per epoch')
-axes[1].set_xlabel('Epochs')
-axes[1].set_ylabel('Loss')
-plt.show()
+# print(losses)
+# fig, axes = plt.subplots(ncols=1, nrows=2)
+# axes[0].plot(np.linspace(1, num_epochs, num_epochs), BERS)
+# axes[0].set_title('BER per epoch')
+# axes[0].set_xlabel('Epochs')
+# axes[0].set_ylabel('BER')
+# axes[1].plot(np.linspace(1, num_epochs, num_epochs), losses)
+# axes[1].set_title('Loss per epoch')
+# axes[1].set_xlabel('Epochs')
+# axes[1].set_ylabel('Loss')
+# plt.show()

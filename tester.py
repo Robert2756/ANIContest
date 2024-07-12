@@ -18,10 +18,10 @@ def test(model, selected_channels):
     PREDICTIONS = []
 
     df = pd.read_csv(path_input, header=None) # (3250, 250)
-    df_test = df.iloc[3000:3250, :]
+    df_test = df.iloc[2500:3250, :]
 
     target_train = pd.read_csv(path_target, header=None) # (3250, 1)
-    target_train = target_train.iloc[3000:3250, :]
+    target_train = target_train.iloc[2500:3250, :]
     target = target_train
 
     data = np.array(df_test.T) # (250,  3250)
@@ -79,12 +79,12 @@ def test(model, selected_channels):
     return BER
 
 
-# selected_channels = [225, 156, 8, 80, 166]
-# model = MLP(input_size=len(selected_channels), hidden_size=32, output_size=1).to("cpu")
-# optimizer = optim.Adam(model.parameters(), lr=0.001)
+# selected_channels = [225, 156, 132, 125, 58, 151, 172, 120, 117]
+# model = MLP(input_size=len(selected_channels), hidden_size=512, output_size=1).to("cpu")
+# optimizer = optim.Adam(model.parameters(), lr=0.005)
 
 # # Load the checkpoint
-# checkpoint = torch.load('checkpoint.pth')
+# checkpoint = torch.load('checkpoint_BER_0.25705.pth')
 
 # # Load the state_dict of the model and optimizer
 # model.load_state_dict(checkpoint['model_state_dict'])
