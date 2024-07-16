@@ -30,7 +30,7 @@ REPETITION = 1
 #         BERS_AV.append(1)
 #         continue
 
-while BER>0.275:
+while BER>0.28:
     selected_features = [225, 156, 132, 125, 58, 151, 172, 120, 117] # , 114, 209, 241, 29, 217, i]
     num_epochs = 1
     BERS_rep = []

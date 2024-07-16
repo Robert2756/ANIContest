@@ -15,11 +15,11 @@ path_target = "./data/ANI_Training.Label"
 class ContestDataset(Dataset):
     def __init__(self, selected_channels):
         df = pd.read_csv(path_input, header=None) # (3250, 250)
-        df_train = df.iloc[0:2500, :]
+        df_train = df.iloc[0:2900, :]
         # print("df_train: ", np.array(df_train).shape)
 
         target_train = pd.read_csv(path_target, header=None) # (3250, 1)
-        target_train = target_train.iloc[0:2500, :]
+        target_train = target_train.iloc[0:2900, :]
         self.target = target_train
 
         data = np.array(df_train.T) # (250,  3250)
