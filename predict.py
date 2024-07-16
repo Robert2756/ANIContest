@@ -44,12 +44,12 @@ def test(model, selected_channels):
             file.write(f"{number}\n")
 
 
-selected_channels = [225, 156, 8, 80, 166]
-model = MLP(input_size=len(selected_channels), hidden_size=32, output_size=1).to("cpu")
+selected_channels = [225, 156, 132, 125, 58, 151, 172, 120, 117]
+model = MLP(input_size=len(selected_channels), hidden_size=512, output_size=1).to("cpu")
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 # Load the checkpoint
-checkpoint = torch.load('checkpoint.pth')
+checkpoint = torch.load('checkpoint_BER_0.25705_3000traindata.pth')
 
 # Load the state_dict of the model and optimizer
 model.load_state_dict(checkpoint['model_state_dict'])
